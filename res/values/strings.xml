@@ -21,11 +21,11 @@
     <!-- General -->
     <skip />
     <!-- Application name -->
-    <string name="application_name" translateable="false">CodnameLauncher</string>
+    <string name="application_name" translateable="false">CNDLauncher</string>
     <!-- Application copyright -->
     <string name="application_copyright">Originally built off of Trebuchet</string>
     <!-- Application version -->
-    <string name="application_version">1</string>
+    <string name="application_version">1.0</string>
 
     <!-- Name for all applications running as this uid. -->
     <string name="uid_name">Android Core Apps</string>
