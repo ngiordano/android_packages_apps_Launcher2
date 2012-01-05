@@ -90,11 +90,16 @@
             <CheckBoxPreference android:key="ui_general_orientation"
                 android:title="@string/preferences_interface_general_orientation_title" />
         </PreferenceScreen>
+        
+        <!-- About -->
+        <PreferenceScreen android:key="ui_about"
+            android:title="@string/preferences_interface_about_title">
+            <PreferenceCategory android:title="@string/preferences_application_title">
+                <Preference android:key="application_version"
+                android:summary="@string/application_copyright" />
+            </PreferenceCategory>
+        </PreferenceScreen>
+        
     </PreferenceCategory>
 
-    <!-- Application -->
-    <PreferenceCategory android:title="@string/preferences_application_title">
-        <Preference android:key="application_version"
-            android:summary="@string/application_copyright" />
-    </PreferenceCategory>
 </PreferenceScreen>
