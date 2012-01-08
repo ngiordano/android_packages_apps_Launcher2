@@ -100,6 +100,10 @@ public class NumberPickerPreference extends DialogPreference {
 
         mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
 
+        if (mNumberPicker == null) {
+            throw new RuntimeException("NumberPicker is null!");
+        }
+
         // Initialize state
         mNumberPicker.setMaxValue(max);
         mNumberPicker.setMinValue(min);
@@ -108,9 +112,11 @@ public class NumberPickerPreference extends DialogPreference {
 
         // No keyboard popup
         EditText textInput = (EditText) mNumberPicker.findViewById(com.android.internal.R.id.numberpicker_input);
-        textInput.setCursorVisible(false);
-        textInput.setFocusable(false);
-        textInput.setFocusableInTouchMode(false);
+        if (textInput != null) {
+            textInput.setCursorVisible(false);
+            textInput.setFocusable(false);
+            textInput.setFocusableInTouchMode(false);
+        }
 
         return view;
     }
