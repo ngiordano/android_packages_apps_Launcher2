@@ -65,6 +65,14 @@ public final class PreferencesProvider {
                     return preferences.getBoolean("ui_homescreen_indicator_fade", true);
                 }
             }
+            public static int getGridRowCount(Context context) {
+                final SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_KEY, 0);
+                return preferences.getInt("ui_homescreen_general_grid_row_count", 4);
+            }
+            public static int getGridColumnCount(Context context) {
+                final SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_KEY, 0);
+                return preferences.getInt("ui_homescreen_general_grid_column", 4);
+            }
         }
 
         public static class Drawer {
