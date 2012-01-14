@@ -255,6 +255,7 @@ public class Workspace extends PagedView
     private boolean mScrollWallpaper;
     private boolean mShowScrollingIndicator;
     private boolean mFadeScrollingIndicator;
+    private boolean mShowDockDivider;
     private TransitionEffect mTransitionEffect;
 
     /**
@@ -344,6 +345,7 @@ public class Workspace extends PagedView
                 res.getBoolean(R.bool.config_workspaceDefualtFadeInAdjacentScreens));
         mShowScrollingIndicator = PreferencesProvider.Interface.Homescreen.Indicator.getShowScrollingIndicator(context);
         mFadeScrollingIndicator = PreferencesProvider.Interface.Homescreen.Indicator.getFadeScrollingIndicator(context);
+        mShowDockDivider = PreferencesProvider.Interface.Homescreen.Indicator.getShowDockDivider(context);
 
         mLauncher = (Launcher) context;
         initWorkspace();
@@ -3692,7 +3694,7 @@ public class Workspace extends PagedView
 
         cancelScrollingIndicatorAnimations();
         if (qsbDivider != null && mShowSearchBar) qsbDivider.setAlpha(reducedFade);
-        if (dockDivider != null) dockDivider.setAlpha(reducedFade);
+        if (dockDivider != null && mShowDockDivider) dockDivider.setAlpha(reducedFade);
         if (scrollIndicator != null && mShowScrollingIndicator) scrollIndicator.setAlpha(1 - fade);
     }
 }
