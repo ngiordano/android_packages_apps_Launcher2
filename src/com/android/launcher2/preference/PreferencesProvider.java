@@ -19,7 +19,7 @@ package com.android.launcher2.preference;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import static com.cyanogenmod.trebuchet.Workspace.TransitionEffect;
+import static com.android.launcher2.Workspace.TransitionEffect;
 
 public final class PreferencesProvider {
     public static final String PREFERENCES_KEY = "com.android.launcher_preferences";
