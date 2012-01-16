@@ -1779,7 +1779,7 @@ public class Workspace extends PagedView
             float rotation = 0f;
             float initialAlpha = cl.getAlpha();
             float finalAlphaMultiplierValue = 1f;
-            float finalAlpha = (mFadeInAdjacentScreens || stateIsSpringLoaded ||
+            float finalAlpha = (!mFadeInAdjacentScreens || stateIsSpringLoaded ||
                     (i == mCurrentPage)) ? 1f : 0f;
 
             // Determine the pages alpha during the state transition
@@ -1868,7 +1868,7 @@ public class Workspace extends PagedView
                     // the current page is visible during (and subsequently, after) the transition
                     // animation.  If fade adjacent pages is disabled, then re-enable the page
                     // visibility after the transition animation.
-                    if (mFadeInAdjacentScreens && stateIsNormal && oldStateIsSmall) {
+                    if (!mFadeInAdjacentScreens && stateIsNormal && oldStateIsSmall) {
                         for (int i = 0; i < getChildCount(); i++) {
                             final CellLayout cl = (CellLayout) getChildAt(i);
                             cl.setAlpha(1f);
