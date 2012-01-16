@@ -19,8 +19,6 @@ package com.android.launcher2.preference;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import static com.android.launcher2.Workspace.TransitionEffect;
-
 public final class PreferencesProvider {
     public static final String PREFERENCES_KEY = "com.android.launcher_preferences";
 
@@ -48,11 +46,6 @@ public final class PreferencesProvider {
                 public static boolean getScrollWallpaper(Context context) {
                     final SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_KEY, 0);
                     return preferences.getBoolean("ui_homescreen_scrolling_scroll_wallpaper", true);
-                }
-                public static TransitionEffect getTransitionEffect(Context context, int def) {
-                    final SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_KEY, 0);
-                    return TransitionEffect.fromInt(Integer.parseInt(
-                            preferences.getString("ui_homescreen_scrolling_transition_effect", Integer.toString(def))));
                 }
             }
             public static class Indicator {
