@@ -2299,8 +2299,14 @@ public final class Launcher extends Activity
 
         setPivotsForZoom(toView, scale);
 
+        Workspace.TransitionEffect transitionEffect = mWorkspace.getTransitionEffect();
+        final boolean animateWorkspace = transitionEffect != Workspace.TransitionEffect.RotateUp &&
+                transitionEffect != Workspace.TransitionEffect.RotateDown;
+
         // Shrink workspaces away if going to AppsCustomize from workspace
-        mWorkspace.changeState(Workspace.State.SMALL, animated);
+        if (animateWorkspace) {
+            mWorkspace.changeState(Workspace.State.SMALL, animated);
+        }
 
         if (animated) {
             final ValueAnimator scaleAnim = ValueAnimator.ofFloat(0f, 1f).setDuration(duration);
@@ -2483,7 +2489,14 @@ public final class Launcher extends Activity
         Resources res = getResources();
         int stagger = res.getInteger(R.integer.config_appsCustomizeWorkspaceAnimationStagger);
 
-        mWorkspace.changeState(Workspace.State.NORMAL, animated, stagger);
+        Workspace.TransitionEffect transitionEffect = mWorkspace.getTransitionEffect();
+        final boolean animateWorkspace = (transitionEffect != Workspace.TransitionEffect.RotateUp &&
+                transitionEffect != Workspace.TransitionEffect.RotateDown) || mWorkspace.getState() != Workspace.State.SMALL;
+
+        if (animateWorkspace) {
+            mWorkspace.changeState(Workspace.State.NORMAL, animated, stagger);
+        }
+
         if (mState != State.WORKSPACE) {
             mWorkspace.setVisibility(View.VISIBLE);
             hideAppsCustomizeHelper(animated, false);

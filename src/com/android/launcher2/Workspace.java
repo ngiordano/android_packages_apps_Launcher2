@@ -92,6 +92,7 @@ public class Workspace extends PagedView
     // Y rotation to apply to the workspace screens
     private static final float WORKSPACE_ROTATION = 12.5f;
     private static final float WORKSPACE_OVERSCROLL_ROTATION = 24f;
+    private static final float WORKSPACE_ROTATION_ANGLE = 12.5f;
     private static float CAMERA_DISTANCE = 6500;
 
     private static final int CHILDREN_OUTLINE_FADE_OUT_DELAY = 0;
@@ -230,6 +231,7 @@ public class Workspace extends PagedView
     private float[] mOldBackgroundAlphas;
     private float[] mOldBackgroundAlphaMultipliers;
     private float[] mOldAlphas;
+    private float[] mOldRotations;
     private float[] mOldRotationYs;
     private float[] mNewTranslationXs;
     private float[] mNewTranslationYs;
@@ -238,6 +240,7 @@ public class Workspace extends PagedView
     private float[] mNewBackgroundAlphas;
     private float[] mNewBackgroundAlphaMultipliers;
     private float[] mNewAlphas;
+    private float[] mNewRotations;
     private float[] mNewRotationYs;
     private float mTransitionProgress;
 
@@ -246,6 +249,8 @@ public class Workspace extends PagedView
         Tablet,
         ZoomIn,
         ZoomOut,
+        RotateUp,
+        RotateDown,
         CubeIn,
         CubeOut,
         Stack
@@ -403,6 +408,14 @@ public class Workspace extends PagedView
                 cl.buildChildrenLayer();
             }
         }
+    }
+
+    public TransitionEffect getTransitionEffect() {
+        return mTransitionEffect;
+    }
+
+    public State getState() {
+        return mState;
     }
 
     public void onDragStart(DragSource source, Object info, int dragAction) {
@@ -1279,6 +1292,37 @@ public class Workspace extends PagedView
         }
     }
 
+    private void screenScrolledRotate(int screenScroll, boolean up) {
+        for (int i = 0; i < getChildCount(); i++) {
+            CellLayout cl = (CellLayout) getPageAt(i);
+            if (cl != null) {
+                float scrollProgress = getScrollProgress(screenScroll, cl, i);
+                float rotation =
+                        (up ? WORKSPACE_ROTATION_ANGLE : -WORKSPACE_ROTATION_ANGLE) * scrollProgress;
+                float translationX = cl.getMeasuredWidth() * scrollProgress;
+
+                float rotatePoint =
+                        (cl.getMeasuredWidth() * 0.5f) /
+                        (float) Math.tan(Math.toRadians((double) (WORKSPACE_ROTATION_ANGLE * 0.5f)));
+
+                cl.setPivotX(cl.getMeasuredWidth() * 0.5f);
+                if (up) {
+                    cl.setPivotY(-rotatePoint);
+                } else {
+                    cl.setPivotY(cl.getMeasuredHeight() + rotatePoint);
+                }
+
+                cl.setRotation(rotation);
+                cl.setFastTranslationX(translationX);
+                if (mFadeInAdjacentScreens && !isSmall()) {
+                    float alpha = 1 - Math.abs(scrollProgress);
+                    cl.setFastAlpha(alpha);
+                }
+                cl.fastInvalidate();
+            }
+        }
+    }
+
     private void screenScrolledCube(int screenScroll, boolean in) {
         for (int i = 0; i < getChildCount(); i++) {
             CellLayout cl = (CellLayout) getPageAt(i);
@@ -1415,6 +1459,12 @@ public class Workspace extends PagedView
                     break;
                 case ZoomOut:
                     screenScrolledZoom(screenScroll, false);
+                    break;
+                case RotateUp:
+                    screenScrolledRotate(screenScroll, true);
+                    break;
+                case RotateDown:
+                    screenScrolledRotate(screenScroll, false);
                     break;
                 case CubeIn:
                     screenScrolledCube(screenScroll, true);
@@ -1766,6 +1816,7 @@ public class Workspace extends PagedView
         mOldBackgroundAlphas = new float[childCount];
         mOldBackgroundAlphaMultipliers = new float[childCount];
         mOldAlphas = new float[childCount];
+        mOldRotations = new float[childCount];
         mOldRotationYs = new float[childCount];
         mNewTranslationXs = new float[childCount];
         mNewTranslationYs = new float[childCount];
@@ -1774,6 +1825,7 @@ public class Workspace extends PagedView
         mNewBackgroundAlphas = new float[childCount];
         mNewBackgroundAlphaMultipliers = new float[childCount];
         mNewAlphas = new float[childCount];
+        mNewRotations = new float[childCount];
         mNewRotationYs = new float[childCount];
     }
 
@@ -1843,6 +1895,7 @@ public class Workspace extends PagedView
         for (int i = 0; i < getChildCount(); i++) {
             final CellLayout cl = (CellLayout) getPageAt(i);
             float rotation = 0f;
+            float rotationY = 0f;
             float initialAlpha = cl.getAlpha();
             float finalAlphaMultiplierValue = 1f;
             float finalAlpha = (!mFadeInAdjacentScreens || stateIsSpringLoaded ||
@@ -1865,9 +1918,9 @@ public class Workspace extends PagedView
             // Update the rotation of the screen
             if (mTransitionEffect == TransitionEffect.Tablet || stateIsSmall || stateIsSpringLoaded) {
                 if (i < mCurrentPage) {
-                    rotation = WORKSPACE_ROTATION;
+                    rotationY = WORKSPACE_ROTATION;
                 } else if (i > mCurrentPage) {
-                    rotation = -WORKSPACE_ROTATION;
+                    rotationY = -WORKSPACE_ROTATION;
                 }
             }
 
@@ -1884,9 +1937,25 @@ public class Workspace extends PagedView
                 }
             }
 
-            if (mTransitionEffect == TransitionEffect.Tablet && stateIsNormal) {
-                translationX = getOffsetXForRotation(rotation, cl.getWidth(), cl.getHeight());
+            if ((mTransitionEffect == TransitionEffect.Tablet && stateIsNormal) ||
+                    (LauncherApplication.isScreenLarge() && (stateIsSmall || stateIsSpringLoaded))) {
+                translationX = getOffsetXForRotation(rotationY, cl.getWidth(), cl.getHeight());
             }
+
+            if (stateIsNormal && (mTransitionEffect == TransitionEffect.RotateUp ||
+                    mTransitionEffect == TransitionEffect.RotateDown)) {
+                rotation = (mTransitionEffect == TransitionEffect.RotateUp ? WORKSPACE_ROTATION_ANGLE : -WORKSPACE_ROTATION_ANGLE) *
+                        Math.abs(mCurrentPage - i);
+            }
+
+            if (stateIsSmall || stateIsSpringLoaded) {
+                cl.setCameraDistance(1280 * mDensity);
+                if (mTransitionEffect == TransitionEffect.RotateUp ||
+                        mTransitionEffect == TransitionEffect.RotateDown) {
+                    cl.setTranslationX(0.0f);
+                }
+                cl.setPivotX(cl.getMeasuredWidth() * 0.5f);
+                cl.setPivotY(cl.getMeasuredHeight() * 0.5f);
 
             mOldAlphas[i] = initialAlpha;
             mNewAlphas[i] = finalAlpha;
@@ -1897,6 +1966,7 @@ public class Workspace extends PagedView
                 mOldScaleYs[i] = cl.getScaleY();
                 mOldBackgroundAlphas[i] = cl.getBackgroundAlpha();
                 mOldBackgroundAlphaMultipliers[i] = cl.getBackgroundAlphaMultiplier();
+                mOldRotations[i] = cl.getRotation();
                 mOldRotationYs[i] = cl.getRotationY();
 
                 mNewTranslationXs[i] = translationX;
@@ -1905,7 +1975,8 @@ public class Workspace extends PagedView
                 mNewScaleYs[i] = finalScaleFactor;
                 mNewBackgroundAlphas[i] = finalBackgroundAlpha;
                 mNewBackgroundAlphaMultipliers[i] = finalAlphaMultiplierValue;
-                mNewRotationYs[i] = rotation;
+                mNewRotations[i] = rotation;
+                mNewRotationYs[i] = rotationY;
             } else {
                 cl.setTranslationX(translationX);
                 cl.setTranslationY(translationY);
@@ -1914,12 +1985,10 @@ public class Workspace extends PagedView
                 cl.setBackgroundAlpha(finalBackgroundAlpha);
                 cl.setBackgroundAlphaMultiplier(finalAlphaMultiplierValue);
                 cl.setAlpha(finalAlpha);
-                cl.setRotationY(rotation);
+                cl.setRotation(rotation);
+                cl.setRotationY(rotationY);
                 mChangeStateAnimationListener.onAnimationEnd(null);
             }
-            cl.setCameraDistance(1280 * mDensity);
-            cl.setPivotX(cl.getMeasuredWidth() * 0.5f);
-            cl.setPivotY(cl.getMeasuredHeight() * 0.5f);
         }
 
         if (animated) {
@@ -1981,6 +2050,7 @@ public class Workspace extends PagedView
                     }
                     for (int i = 0; i < getChildCount(); i++) {
                         final CellLayout cl = (CellLayout) getPageAt(i);
+                        cl.setRotation(a * mOldRotations[i] + b * mNewRotations[i]);
                         cl.setFastRotationY(a * mOldRotationYs[i] + b * mNewRotationYs[i]);
                     }
                 }
