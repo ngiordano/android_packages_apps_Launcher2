@@ -331,8 +331,8 @@ public class Workspace extends PagedView
         mDragViewMultiplyColor = res.getColor(R.color.drag_view_multiply_color);
 
         // if the value is manually specified, use that instead
-        cellCountX = PreferencesProvider.Interface.Homescreen.getGridColumnCount(context);
-        cellCountY = PreferencesProvider.Interface.Homescreen.getGridRowCount(context);
+        cellCountX = a.getInt(R.styleable.Workspace_cellCountX, cellCountX);
+        cellCountY = a.getInt(R.styleable.Workspace_cellCountY, cellCountY);
         a.recycle();
 
         LauncherModel.updateWorkspaceLayoutCells(cellCountX, cellCountY);
