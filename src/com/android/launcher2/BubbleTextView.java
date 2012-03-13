@@ -99,7 +99,6 @@ public class BubbleTextView extends TextView {
         setCompoundDrawablesWithIntrinsicBounds(null,
                 new FastBitmapDrawable(b),
                 null, null);
-        setText(info.title);
         setTag(info);
     }
 
