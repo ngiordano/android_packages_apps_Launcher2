@@ -90,6 +90,9 @@ public class DeleteDropTarget extends ButtonDropTarget {
         }
     }
 
+    private boolean isAllAppsItem(DragSource source, Object info) {
+        return isAllAppsApplication(source, info) || isAllAppsWidget(source, info);
+    }
     private boolean isAllAppsApplication(DragSource source, Object info) {
         return (source instanceof AppsCustomizePagedView) && (info instanceof ApplicationInfo);
     }
@@ -145,7 +148,11 @@ public class DeleteDropTarget extends ButtonDropTarget {
         setTextColor(mOriginalTextColor);
         ((ViewGroup) getParent()).setVisibility(View.VISIBLE);
         if (getText().length() > 0) {
-            setText(R.string.delete_target_label);
+            if (isAllAppsItem(source, info)) {
+                setText(R.string.cancel_target_label);
+            } else {
+                setText(R.string.delete_target_label);
+            }
         }
     }
 
@@ -193,7 +200,11 @@ public class DeleteDropTarget extends ButtonDropTarget {
             mMode = MODE_DELETE;
 
             if (getText().length() > 0) {
-                setText(R.string.delete_target_label);
+                if (isAllAppsItem(d.dragSource, d.dragInfo)) {
+                    setText(R.string.cancel_target_label);
+                } else {
+                    setText(R.string.delete_target_label);
+                }
             }
 
             setCompoundDrawablesWithIntrinsicBounds(mRemoveNormalDrawable, null, null, null);
