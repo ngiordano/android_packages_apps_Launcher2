@@ -259,6 +259,8 @@ public class Workspace extends PagedView
     // Preferences
     private int mNumberHomescreens;
     private int mDefaultHomescreen;
+    private int mScreenPaddingVertical;
+    private int mScreenPaddingHorizontal;
     private boolean mShowSearchBar;
     private boolean mResizeAnyWidget;
     private boolean mScrollWallpaper;
@@ -345,6 +347,8 @@ public class Workspace extends PagedView
         if (mDefaultHomescreen >= mNumberHomescreens) {
             mDefaultHomescreen = mNumberHomescreens / 2;
         }
+        mScreenPaddingVertical = PreferencesProvider.Interface.Homescreen.getScreenPaddingVertical(context);
+        mScreenPaddingHorizontal = PreferencesProvider.Interface.Homescreen.getScreenPaddingHorizontal(context);
         mShowSearchBar = PreferencesProvider.Interface.Homescreen.getShowSearchBar(context);
         mResizeAnyWidget = PreferencesProvider.Interface.Homescreen.getResizeAnyWidget(context);
         mScrollWallpaper = PreferencesProvider.Interface.Homescreen.Scrolling.getScrollWallpaper(context);
@@ -448,8 +452,12 @@ public class Workspace extends PagedView
         LayoutInflater inflater =
                 (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (int i = 0; i < mNumberHomescreens; i++) {
-            inflater.inflate(R.layout.workspace_screen, this);
-        }
+            View screen = inflater.inflate(R.layout.workspace_screen, null);
+            screen.setPadding(screen.getPaddingLeft() + mScreenPaddingHorizontal,
+                    screen.getPaddingTop() + mScreenPaddingVertical,
+                    screen.getPaddingRight() + mScreenPaddingHorizontal,
+                    screen.getPaddingBottom() + mScreenPaddingVertical);
+            addView(screen);        }
 
         try {
             mBackground = res.getDrawable(R.drawable.apps_customize_bg);
