@@ -924,8 +924,7 @@ public class Workspace extends PagedView
         return offset;
     }
     private void syncWallpaperOffsetWithScroll() {
-        final boolean enableWallpaperEffects = isHardwareAccelerated();
-        if (enableWallpaperEffects) {
+        if (mScrollWallpaper) {
             mWallpaperOffset.setFinalX(wallpaperOffsetForCurrentScroll());
         }
     }
