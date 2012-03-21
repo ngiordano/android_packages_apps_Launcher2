@@ -586,6 +586,8 @@ public class Workspace extends PagedView
                 // Hide titles in the hotseat
                 if (child instanceof FolderIcon) {
                     ((FolderIcon) child).setTextVisible(false);
+                } else if (child instanceof BubbleTextView) {
+                    ((BubbleTextView) child).setTextVisible(false);
                 }
             }
 
@@ -602,6 +604,8 @@ public class Workspace extends PagedView
                 // Show titles if not in the hotseat
                 if (child instanceof FolderIcon) {
                     ((FolderIcon) child).setTextVisible(true);
+                } else if (child instanceof BubbleTextView) {
+                    ((BubbleTextView) child).setTextVisible(true);
                 }
             }
 
