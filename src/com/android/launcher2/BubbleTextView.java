@@ -64,9 +64,6 @@ public class BubbleTextView extends TextView {
 
     private boolean mStayPressed;
 
-    private boolean mTextVisible = true;
-    private CharSequence mVisibleText;
-
     public BubbleTextView(Context context) {
         super(context);
         init();
@@ -318,16 +315,5 @@ public class BubbleTextView extends TextView {
             super.onSetAlpha(alpha);
         }
         return true;
-    }
-
-    public void setTextVisible(boolean visible) {
-        if (mTextVisible == visible) return;
-        mTextVisible = visible;
-        if (visible) {
-            setText(mVisibleText);
-        } else {
-            mVisibleText = getText();
-            setText("");
-        }
     }
 }

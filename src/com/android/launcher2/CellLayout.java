@@ -256,6 +256,7 @@ public class CellLayout extends ViewGroup {
         mForegroundRect = new Rect();
 
         mChildren = new CellLayoutChildren(context);
+        mChildren.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap);
         addView(mChildren);
     }
 
@@ -835,11 +836,6 @@ public class CellLayout extends ViewGroup {
         int numWidthGaps = mCountX - 1;
         int numHeightGaps = mCountY - 1;
 
-        if (!LauncherApplication.isScreenLarge()){
-            mCellWidth = mOriginalCellWidth = (widthSpecSize - mPaddingLeft - mPaddingRight) / mCountX;
-            mCellHeight = mOriginalCellHeight = (heightSpecSize - mPaddingTop - mPaddingBottom) / mCountY;
-        }
-
         if (mOriginalWidthGap < 0 || mOriginalHeightGap < 0) {
             int hSpace = widthSpecSize - mPaddingLeft - mPaddingRight;
             int vSpace = heightSpecSize - mPaddingTop - mPaddingBottom;
@@ -852,8 +848,6 @@ public class CellLayout extends ViewGroup {
             mWidthGap = mOriginalWidthGap;
             mHeightGap = mOriginalHeightGap;
         }
-
-        mChildren.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap);
 
         // Initial values correspond to widthSpecMode == MeasureSpec.EXACTLY
         int newWidth = widthSpecSize;
